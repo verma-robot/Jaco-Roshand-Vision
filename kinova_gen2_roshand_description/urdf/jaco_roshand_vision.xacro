@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot
+
+	xmlns:xacro="http://www.ros.org/wiki/xacro" name="jaco_roshand_robot">  
+
+   
+
+         <xacro:include filename="$(find kinova_gen2_roshand_description)/urdf/jaco_vision.xacro"/>     
+        
+
+
+        <link name="root"/>
+        <xacro:property name="robot_root" value="root" />
+
+        <xacro:jaco  base_parent="${robot_root}" prefix = "jaco" camera_name = "camera_on_hand" />
+ 
+
+</robot>

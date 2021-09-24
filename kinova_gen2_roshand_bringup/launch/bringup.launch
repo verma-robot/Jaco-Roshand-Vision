@@ -1,0 +1,15 @@
+<launch>
+
+
+
+ <include file="$(find roshand_gen2_driver)/launch/bringup.launch" />
+ <include file="$(find kinova_bringup)/launch/kinova_robot.launch" />
+
+ <param name="robot_description" command="$(find xacro)/xacro '$(find kinova_gen2_roshand_description)/urdf/jaco_roshand.xacro'" />
+
+  <node name="kinova_roshand_state_pub" pkg="kinova_gen2_roshand_bringup" type="kinova_roshand_state_pub">
+      <!--remap from="joint_states" to="/all_joint_state"/-->
+  </node>
+
+  <!--node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /-->
+</launch>

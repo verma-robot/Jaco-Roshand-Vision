@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+
+
+<root xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find kinova_gen2_roshand_description)/urdf/jaco_inertial.xacro" />
+
+
+    <xacro:property name="J_PI" value="3.1415926535897931" />
+
+    <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no">
+        <link name="${link_name}">
+            <visual>
+                <geometry>
+                    <mesh
+                        filename="package://kinova_gen2_roshand_description/meshes/${link_mesh}.dae"/>
+                </geometry>
+                <material name="carbon_fiber">
+                    <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+                </material>
+            </visual>
+
+	    <!-- Adding ring to the model -->
+	         <xacro:if value="${use_ring_mesh}">
+	           <visual>
+                <geometry>
+                    <mesh
+                        filename="package://kinova_gen2_roshand_description/meshes/${ring_mesh}.dae"/>
+                </geometry>
+             </visual>
+	    </xacro:if>
+
+            <collision>
+                <geometry>
+                    <mesh
+                        filename="package://kinova_gen2_roshand_description/meshes/${link_mesh}.dae"/>
+                </geometry>
+            </collision>
+						<xacro:kinova_inertial mesh_no="${mesh_no}"/>
+      </link>
+
+    </xacro:macro>
+
+  <xacro:macro name="kinova_armjoint" params="joint_name type parent child joint_axis_xyz joint_origin_xyz joint_origin_rpy joint_lower_limit joint_upper_limit fixed:=false">
+    <joint name="${joint_name}" type="${type}">
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <axis xyz="${joint_axis_xyz}"/>
+        <limit effort="2000" velocity="1" lower="${joint_lower_limit}" upper="${joint_upper_limit}"/>
+        <origin xyz="${joint_origin_xyz}" rpy="${joint_origin_rpy}"/>
+        <dynamics damping="0.0" friction="0.0"/>
+     </joint>
+   <xacro:unless value="${fixed}">
+     <transmission name="${joint_name}_trans">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="${joint_name}">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="${joint_name}_actuator">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>160</mechanicalReduction>
+        </actuator>
+     </transmission>
+     </xacro:unless>
+  </xacro:macro>
+
+
+    <xacro:macro name="kinova_virtual_link" params="link_name">
+        <link name="${link_name}"/>
+    </xacro:macro>
+
+    <xacro:macro name="kinova_virtual_joint" params="joint_name type parent child joint_axis_xyz joint_origin_xyz joint_origin_rpy joint_lower_limit joint_upper_limit">
+    <joint name="${joint_name}" type="${type}">
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <axis xyz="${joint_axis_xyz}"/>
+        <limit effort="2000" velocity="1" lower="${joint_lower_limit}" upper="${joint_upper_limit}"/>
+        <origin xyz="${joint_origin_xyz}" rpy="${joint_origin_rpy}"/>
+     </joint>
+    </xacro:macro>
+
+<xacro:macro name="gazebo_config" params="robot_namespace">
+
+    <!-- ros_control plugin -->
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        <legacyModeNS>true</legacyModeNS>
+      </plugin>
+    </gazebo>
+
+</xacro:macro>
+
+</root>
